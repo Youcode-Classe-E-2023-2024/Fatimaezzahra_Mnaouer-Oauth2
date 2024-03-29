@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ForgotPasswordController;
+use App\Http\Controllers\RoleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -16,4 +19,33 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
+});
+
+Route::post('/login', [AuthController::class, 'login']);
+
+Route::post('/register', [AuthController::class, 'register']);
+
+Route::apiResource('/Role',RoleController::class);
+
+
+
+Route::middleware('auth:api')->group(function () {
+//    Route::get('user', 'AuthController@user');
+
+});
+
+
+
+
+
+
+
+Route::group([
+    'middleware' => 'auth:api'
+], function () {
+    Route::apiResource('/forget',ForgotPasswordController::class);
+//    Route::post('/login', [ForgotPasswordController::class, 'store']);
+//    Route::put('/login', [ForgotPasswordController::class, 'update']);
+
+//    Route::post('logout', [AuthController::class, 'logout']);
 });
