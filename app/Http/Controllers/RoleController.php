@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Permission;
 use App\Models\Role;
 use Illuminate\Http\Request;
 
@@ -88,5 +89,14 @@ class RoleController extends Controller
         $role->delete();
 
         return response()->json(['message' => 'Role deleted successfully']);
+    }
+
+
+    public function assignRole(Request $request, $userid)
+    {
+
+        $role = Role::findOrFail($request->role_id);
+        $role->user()->attach($userid);
+        return response()->json(['message' => 'Role assigned successfully']);
     }
 }
