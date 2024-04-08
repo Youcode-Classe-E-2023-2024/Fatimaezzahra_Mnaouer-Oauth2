@@ -2,9 +2,12 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ForgotPasswordController;
+use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\userController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Laravel\Passport\Http\Middleware\Authenticate;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,35 +20,32 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::get('debug', function () {
+    $user = \App\Models\User::find(7);
+    dd($user->role->first()->toArray());
 });
 
-Route::post('/login', [AuthController::class, 'login']);
-
-Route::post('/register', [AuthController::class, 'register']);
-
-Route::apiResource('/Role',RoleController::class);
-
-
+Route::middleware('guest')->group(function () {
+    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/register', [AuthController::class, 'register']);
+});
 
 Route::middleware('auth:api')->group(function () {
-//    Route::get('user', 'AuthController@user');
-
-});
-
-
-
-
-
-
-
-Route::group([
-    'middleware' => 'auth:api'
-], function () {
+    /* Auth */
+    Route::post('/logout', [AuthController::class,'logout']);
     Route::apiResource('/forget',ForgotPasswordController::class);
-//    Route::post('/login', [ForgotPasswordController::class, 'store']);
-//    Route::put('/login', [ForgotPasswordController::class, 'update']);
+    Route::get('/user', function (Request $request) {return $request->user();});
 
-//    Route::post('logout', [AuthController::class, 'logout']);
+    /* Role */
+    Route::apiResource('/role',RoleController::class);
+    Route::post('/role/{user_id}',[RoleController::class, 'assignRole']);
+
+    /* PERMISSION */
+    Route::apiResource('/permission',PermissionController::class);
+    Route::post('/permission/{role_id}',[PermissionController::class, 'assignPermission']);
+
+    /* USER */
+    Route::post('/users', [UserController::class, 'addUser']);
+    Route::put('/users/{id}', [UserController::class, 'editUser']);
+    Route::delete('/users/{id}', [UserController::class, 'deleteUser']);
 });

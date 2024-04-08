@@ -82,9 +82,9 @@ Display the specified resource .*/
     /**
      *
      * Remove the specified resource from storage.*/
-  public function destroy($permission)
+  public function destroy(string $id)
     {
-        $permission = Permission::findOrFail($permission);
+        $permission = Permission::findOrFail($id);
         $permission->delete();
         return response()->json(['message' => 'Permission deleted successfully']);
     }
@@ -92,7 +92,6 @@ Display the specified resource .*/
 
     public function assignPermission(Request $request, $roleId)
     {
-
         $permission = Permission::findOrFail($request->permission_id);
         $permission->role()->attach($roleId);
         return response()->json(['message' => 'Permission assigned successfully']);
